@@ -26,6 +26,27 @@
 
 ## 使用说明
 
+```php
+$sql1 = <<<SQL
+CREATE TABLE `a` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL;
+
+$sql2 = <<<SQL
+CREATE TABLE `a` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL;
+
+// 返回将 $sql1 结构升级到 $sql2 的 SQL 语句数组
+$sqls = \Yurun\SqlDiff\SqlDiff::diff($sql1, $sql2);
+var_dump($sqls);
+```
+
 ## 运行环境
 
 * [PHP](https://php.net/) >= 7.4
