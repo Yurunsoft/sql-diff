@@ -1,0 +1,22 @@
+* text=auto eol=lf
+
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.github export-ignore
+/res export-ignore
+/tests export-ignore
+/doc export-ignore
+/website export-ignore
+/mddoc export-ignore
+/split-repository export-ignore
+/dev export-ignore
+/src/Components export-ignore
+/.editorconfig export-ignore
+/.markdownlint.json export-ignore
+/.php-cs-fixer.php export-ignore
+/package.json export-ignore
+/phpstan-components.neon export-ignore
+/phpstan.neon export-ignore
+/phpstan.sh export-ignore
+/rector.php export-ignore
+/rector.sh export-ignore

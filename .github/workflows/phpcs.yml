@@ -1,0 +1,35 @@
+name: Coding Standards
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.4]
+    env:
+      PHP_VERSION: ${{ matrix.php }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl
+          extensions: >
+            curl, openssl, mbstring, zip
+      - name: Check Version
+        run: |
+          php -v
+          php -m
+          composer -V
+          php --ri swoole
+      - name: Prepare
+        run: |
+          composer update
+      - name: Test
+        run: |
+          ./vendor/bin/php-cs-fixer fix --dry-run --diff -vvv

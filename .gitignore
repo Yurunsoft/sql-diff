@@ -1,0 +1,8 @@
+vendor
+composer.lock
+*.log
+/.idea
+*.cache
+*.lock
+/.vscode
+/.phpbench
