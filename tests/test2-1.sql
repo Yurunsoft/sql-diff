@@ -1,19 +1,3 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : 127.0.0.1_3306
- Source Server Type    : MySQL
- Source Server Version : 50736
- Source Host           : 127.0.0.1:3306
- Source Schema         : a
-
- Target Server Type    : MySQL
- Target Server Version : 50736
- File Encoding         : 65001
-
- Date: 19/09/2022 16:29:54
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
