@@ -26,7 +26,6 @@ jobs:
           php -v
           php -m
           composer -V
-          php --ri swoole
       - name: Prepare
         run: |
           composer update
