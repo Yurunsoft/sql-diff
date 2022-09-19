@@ -1,4 +1,4 @@
-# imi-nacos
+# sql-diff
 
 [![Latest Version](https://img.shields.io/packagist/v/yurunsoft/sql-diff.svg)](https://packagist.org/packages/yurunsoft/sql-diff)
 [![Php Version](https://img.shields.io/badge/php-%3E=7.4-brightgreen.svg)](https://secure.php.net/)
