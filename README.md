@@ -20,6 +20,8 @@
 
 * [x] 分区
 
+* [x] 视图
+
 ## 安装
 
 `composer require yurunsoft/sql-diff`

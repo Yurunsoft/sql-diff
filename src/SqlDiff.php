@@ -72,7 +72,14 @@ class SqlDiff
         $sqls = [];
         foreach (array_diff_key($this->oldTableStatements, $this->newTableStatements) as $key => $_)
         {
-            $sqls[] = 'DROP TABLE ' . $this->oldTableStatements[$key]->name;
+            if ($this->oldTableStatements[$key]->options->has('VIEW'))
+            {
+                $sqls[] = 'DROP VIEW ' . $this->oldTableStatements[$key]->name;
+            }
+            else
+            {
+                $sqls[] = 'DROP TABLE ' . $this->oldTableStatements[$key]->name;
+            }
         }
 
         return $sqls;
@@ -97,22 +104,38 @@ class SqlDiff
         {
             $oldStatement = $this->oldTableStatements[$key];
             $newStatement = $this->newTableStatements[$key];
-            // 索引
-            $indexesSqls = $this->getIndexesDiffSqls($oldStatement, $newStatement);
-            // 外键
-            $constraintSqls = $this->getConstraintDiffSqls($oldStatement, $newStatement);
-            $sqls = array_merge($sqls,
-                // 表
-                $this->getTableOptionsSqls($oldStatement, $newStatement),
-                $constraintSqls['drop'],
-                $indexesSqls['drop'],
-                // 字段
-                $this->getFieldsDiffSqls($oldStatement, $newStatement),
-                $indexesSqls['add'],
-                $constraintSqls['add'],
-                // 分区
-                $this->getPartitionDiffSqls($oldStatement, $newStatement),
-            );
+            if ($this->oldTableStatements[$key]->options->has('VIEW'))
+            {
+                if ($newStatement->__toString() !== $oldStatement->__toString())
+                {
+                    if (!$newStatement->options->has('OR REPLACE'))
+                    {
+                        $newOptions = $newStatement->options->options;
+                        array_unshift($newOptions, 'OR REPLACE');
+                        $newStatement->options = new OptionsArray($newOptions);
+                    }
+                    $sqls[] = $newStatement->__toString();
+                }
+            }
+            else
+            {
+                // 索引
+                $indexesSqls = $this->getIndexesDiffSqls($oldStatement, $newStatement);
+                // 外键
+                $constraintSqls = $this->getConstraintDiffSqls($oldStatement, $newStatement);
+                $sqls = array_merge($sqls,
+                    // 表
+                    $this->getTableOptionsSqls($oldStatement, $newStatement),
+                    $constraintSqls['drop'],
+                    $indexesSqls['drop'],
+                    // 字段
+                    $this->getFieldsDiffSqls($oldStatement, $newStatement),
+                    $indexesSqls['add'],
+                    $constraintSqls['add'],
+                    // 分区
+                    $this->getPartitionDiffSqls($oldStatement, $newStatement),
+                );
+            }
         }
 
         return $sqls;

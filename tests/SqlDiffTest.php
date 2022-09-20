@@ -47,4 +47,15 @@ class SqlDiffTest extends TestCase
         ALTER TABLE `tb_diff2` ADD CONSTRAINT `tb_diff2_ibfk_1` FOREIGN KEY (`value`) REFERENCES `tb_test2` (`value`) ON DELETE RESTRICT ON UPDATE RESTRICT ;
         SQL, implode(';' . \PHP_EOL, $sqls) . ';');
     }
+
+    public function testView(): void
+    {
+        $sql = <<<SQL
+        CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `1`, 2 AS `2` ;
+        SQL;
+        $sqls = SqlDiff::diff(file_get_contents(__DIR__ . '/test-view-1.sql'), file_get_contents(__DIR__ . '/test-view-2-1.sql'));
+        $this->assertEquals($sql, implode(';' . \PHP_EOL, $sqls) . ';');
+        $sqls = SqlDiff::diff(file_get_contents(__DIR__ . '/test-view-1.sql'), file_get_contents(__DIR__ . '/test-view-2-2.sql'));
+        $this->assertEquals($sql, implode(';' . \PHP_EOL, $sqls) . ';');
+    }
 }

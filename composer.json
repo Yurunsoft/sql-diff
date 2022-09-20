@@ -2,7 +2,7 @@
     "name": "yurunsoft/sql-diff",
     "LICENSE": "GPL-2.0",
     "require": {
-        "phpmyadmin/sql-parser": "^5.5"
+        "phpmyadmin/sql-parser": "dev-master"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "~3.4.0",
