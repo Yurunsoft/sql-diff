@@ -50,6 +50,10 @@ class SqlDiffTest extends TestCase
 
     public function testView(): void
     {
+        $sqls = SqlDiff::diff('', file_get_contents(__DIR__ . '/test-view-1.sql'));
+        $this->assertEquals(<<<SQL
+        CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `1` ;
+        SQL, implode(';' . \PHP_EOL, $sqls) . ';');
         $sql = <<<SQL
         CREATE OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v1`  AS SELECT 1 AS `1`, 2 AS `2` ;
         SQL;
