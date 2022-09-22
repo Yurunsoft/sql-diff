@@ -517,6 +517,11 @@ class SqlDiff
                 $sql .= "\nSUBPARTITIONS " . $newStatement->subpartitionsNum;
             }
 
+            if (!empty($newStatement->partitions))
+            {
+                $sql .= "\n" . PartitionDefinition::build($newStatement->partitions);
+            }
+
             if ($sql)
             {
                 $alterStatement = new AlterStatement();

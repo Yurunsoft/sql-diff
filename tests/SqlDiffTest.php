@@ -29,7 +29,13 @@ class SqlDiffTest extends TestCase
         ALTER TABLE `tb_diff1` ADD INDEX `tb_diff1_ibfk_1` (`index2`) USING BTREE ;
         ALTER TABLE `tb_diff1` 
         PARTITION BY HASH (`id`)
-        PARTITIONS 4 ;
+        PARTITIONS 4
+        (
+        PARTITION p0 MAX_ROWS=0 MIN_ROWS=0,
+        PARTITION p1 MAX_ROWS=0 MIN_ROWS=0,
+        PARTITION p2 MAX_ROWS=0 MIN_ROWS=0,
+        PARTITION p3 MAX_ROWS=0 MIN_ROWS=0
+        ) ;
         SQL, implode(';' . \PHP_EOL, $sqls) . ';');
     }
 
