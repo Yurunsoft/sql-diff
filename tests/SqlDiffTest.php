@@ -68,4 +68,9 @@ class SqlDiffTest extends TestCase
         $sqls = SqlDiff::diff(file_get_contents(__DIR__ . '/test-view-1.sql'), file_get_contents(__DIR__ . '/test-view-2-2.sql'));
         $this->assertEquals($sql, implode(';' . \PHP_EOL, $sqls) . ';');
     }
+
+    public function testMysqlVersion(): void
+    {
+        $this->assertEquals([], SqlDiff::diff(file_get_contents(__DIR__ . '/test-mysql5.7.sql'), file_get_contents(__DIR__ . '/test-mysql8.0.sql')));
+    }
 }

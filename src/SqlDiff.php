@@ -33,6 +33,8 @@ class SqlDiff
 
     public const FOREIGN_KEY_TYPE = 'FOREIGN KEY';
 
+    public const INT_TYPES = ['INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT'];
+
     public static function diff(string $oldSql, string $newSql): array
     {
         return (new self($oldSql, $newSql))->getDiffSqls();
@@ -316,6 +318,32 @@ class SqlDiff
                 {
                     if ($field->__toString() !== $fieldOld->__toString())
                     {
+                        // ---兼容处理开始---
+                        // MySQL 8.0 对 INT 类型的长度失效兼容
+                        $parametersBackup = $field->type->parameters;
+                        $parametersBackupOld = $fieldOld->type->parameters;
+                        if (\in_array($field->type->name, self::INT_TYPES) && \in_array($fieldOld->type->name, self::INT_TYPES))
+                        {
+                            $field->type->parameters = $fieldOld->type->parameters = [];
+                        }
+                        // MySQL 8.0 对 CHARACTER SET 的兼容
+                        $optionsBackup = $field->type->options->options;
+                        $optionsBackupOld = $fieldOld->type->options->options;
+                        if ($field->type->options->has('COLLATE') === $fieldOld->type->options->has('COLLATE') && (!$field->type->options->has('CHARACTER SET') || !$fieldOld->type->options->has('CHARACTER SET')))
+                        {
+                            $field->type->options->remove('CHARACTER SET');
+                            $fieldOld->type->options->remove('CHARACTER SET');
+                        }
+                        $equals = $field->__toString() === $fieldOld->__toString();
+                        $field->type->parameters = $parametersBackup;
+                        $fieldOld->type->parameters = $parametersBackupOld;
+                        $field->type->options = new OptionsArray($optionsBackup);
+                        $fieldOld->type->options->options = new OptionsArray($optionsBackupOld);
+                        if ($equals)
+                        {
+                            break;
+                        }
+                        // ---兼容处理结束---
                         $alterStatement = new AlterStatement();
                         $alterStatement->options = new OptionsArray(['TABLE']);
                         $alterStatement->table = $oldStatement->name;
