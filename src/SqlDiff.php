@@ -226,11 +226,6 @@ class SqlDiff
                         $alterStatement->table = $oldStatement->name;
                         $alterOperation = new AlterOperation(new OptionsArray(['DROP', $fieldOld->key->type]), new Expression(null, null, $fieldOld->key->name));
                         $alterStatement->altered[] = $alterOperation;
-                        $sqls['drop'][] = $alterStatement->__toString();
-
-                        $alterStatement = new AlterStatement();
-                        $alterStatement->options = new OptionsArray(['TABLE']);
-                        $alterStatement->table = $oldStatement->name;
                         $alterOperation = new AlterOperation(new OptionsArray(['ADD']), $field);
                         $alterStatement->altered[] = $alterOperation;
                         $sqls['add'][] = $alterStatement->__toString();
