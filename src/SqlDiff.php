@@ -33,7 +33,7 @@ class SqlDiff
 
     public const FOREIGN_KEY_TYPE = 'FOREIGN KEY';
 
-    public const INT_TYPES = ['INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT'];
+    public const INT_TYPES = ['INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT', 'YEAR'];
 
     public static function diff(string $oldSql, string $newSql): array
     {
