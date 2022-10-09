@@ -148,8 +148,13 @@ class SqlDiff
         $options = [];
         foreach ($newStatement->entityOptions->options as $option)
         {
-            if ($option['expr'] !== $oldStatement->entityOptions->has($option['name'], true))
+            $oldExpr = $oldStatement->entityOptions->has($option['name'], true);
+            if ($option['expr'] !== $oldExpr)
             {
+                if ('DEFAULT CHARSET' === $option['name'] && (('utf8' === $option['expr'] && 'utf8mb3' === $oldExpr) || ('utf8mb3' === $option['expr'] && 'utf8' === $oldExpr)))
+                {
+                    continue;
+                }
                 $options[] = $option;
             }
         }
