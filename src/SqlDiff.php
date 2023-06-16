@@ -66,6 +66,9 @@ class SqlDiff
             $this->getDropTableSqls(),
             $this->getCreateTableSqls(),
             $this->getAlterTableSqls(),
+            $this->getDropViewSqls(),
+            $this->getCreateViewSqls(),
+            $this->getAlterViewSqls(),
         );
     }
 
@@ -74,11 +77,7 @@ class SqlDiff
         $sqls = [];
         foreach (array_diff_key($this->oldTableStatements, $this->newTableStatements) as $key => $_)
         {
-            if ($this->oldTableStatements[$key]->options->has('VIEW'))
-            {
-                $sqls[] = 'DROP VIEW ' . $this->oldTableStatements[$key]->name;
-            }
-            else
+            if (!$this->oldTableStatements[$key]->options->has('VIEW'))
             {
                 $sqls[] = 'DROP TABLE ' . $this->oldTableStatements[$key]->name;
             }
@@ -93,13 +92,76 @@ class SqlDiff
         /** @var CreateStatement $statement */
         foreach (array_diff_key($this->newTableStatements, $this->oldTableStatements) as $statement)
         {
-            $sqls[] = $statement->__toString();
+            if (!$statement->options->has('VIEW'))
+            {
+                $sqls[] = $statement->__toString();
+            }
         }
 
         return $sqls;
     }
 
     public function getAlterTableSqls(): array
+    {
+        $sqls = [];
+        foreach (array_intersect_key($this->oldTableStatements, $this->newTableStatements) as $key => $_)
+        {
+            $oldStatement = $this->oldTableStatements[$key];
+            $newStatement = $this->newTableStatements[$key];
+            if (!$this->oldTableStatements[$key]->options->has('VIEW'))
+            {
+                // 索引
+                $indexesSqls = $this->getIndexesDiffSqls($oldStatement, $newStatement);
+                // 外键
+                $constraintSqls = $this->getConstraintDiffSqls($oldStatement, $newStatement);
+                $sqls = array_merge($sqls,
+                    // 表
+                    $this->getTableOptionsSqls($oldStatement, $newStatement),
+                    $constraintSqls['drop'],
+                    $indexesSqls['drop'],
+                    // 字段
+                    $this->getFieldsDiffSqls($oldStatement, $newStatement),
+                    $indexesSqls['add'],
+                    $constraintSqls['add'],
+                    // 分区
+                    $this->getPartitionDiffSqls($oldStatement, $newStatement),
+                );
+            }
+        }
+
+        return $sqls;
+    }
+
+    public function getDropViewSqls(): array
+    {
+        $sqls = [];
+        foreach (array_diff_key($this->oldTableStatements, $this->newTableStatements) as $key => $_)
+        {
+            if ($this->oldTableStatements[$key]->options->has('VIEW'))
+            {
+                $sqls[] = 'DROP VIEW ' . $this->oldTableStatements[$key]->name;
+            }
+        }
+
+        return $sqls;
+    }
+
+    public function getCreateViewSqls(): array
+    {
+        $sqls = [];
+        /** @var CreateStatement $statement */
+        foreach (array_diff_key($this->newTableStatements, $this->oldTableStatements) as $statement)
+        {
+            if ($statement->options->has('VIEW'))
+            {
+                $sqls[] = $statement->__toString();
+            }
+        }
+
+        return $sqls;
+    }
+
+    public function getAlterViewSqls(): array
     {
         $sqls = [];
         foreach (array_intersect_key($this->oldTableStatements, $this->newTableStatements) as $key => $_)
@@ -118,25 +180,6 @@ class SqlDiff
                     }
                     $sqls[] = $newStatement->__toString();
                 }
-            }
-            else
-            {
-                // 索引
-                $indexesSqls = $this->getIndexesDiffSqls($oldStatement, $newStatement);
-                // 外键
-                $constraintSqls = $this->getConstraintDiffSqls($oldStatement, $newStatement);
-                $sqls = array_merge($sqls,
-                    // 表
-                    $this->getTableOptionsSqls($oldStatement, $newStatement),
-                    $constraintSqls['drop'],
-                    $indexesSqls['drop'],
-                    // 字段
-                    $this->getFieldsDiffSqls($oldStatement, $newStatement),
-                    $indexesSqls['add'],
-                    $constraintSqls['add'],
-                    // 分区
-                    $this->getPartitionDiffSqls($oldStatement, $newStatement),
-                );
             }
         }
 
